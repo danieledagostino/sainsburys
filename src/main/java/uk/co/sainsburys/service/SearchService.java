@@ -5,18 +5,19 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import uk.co.sainsburys.domain.Product;
-import uk.co.sainsburys.gateway.PageReader;
-import uk.co.sainsburys.gateway.WebPageReader;
 
 public class SearchService {
 	private static final Logger logger = Logger.getLogger(SearchService.class);
-	private PageReader pageReader = new WebPageReader();
+	
+	public SearchService() {
+	}
 
 	public Product getProduct(Element element) throws IOException {
 
@@ -27,9 +28,9 @@ public class SearchService {
 
 		String url = getProductUrl(element);
 		if (url != null) {
-			Document productPage = pageReader.getAsJsoupDocument(url);
+			Document productPage = Jsoup.connect(url).get();
 			result.setDescription(getDescription(productPage));
-			result.setSize(pageReader.getWebpageSizeInKb(url));
+			result.setKcal(getKcal(productPage));
 		}
 
 		return result;
@@ -37,7 +38,7 @@ public class SearchService {
 
 	private String getProductUrl(Element element) {
 		try {
-			Element a = element.getElementsByClass("productInfo").first().getElementsByTag("a").first();
+			Element a = element.getElementsByTag("a").first();
 			return a.attr("href");
 		} catch (Exception e) {
 			logger.error("Failed to find url", e);
@@ -81,6 +82,20 @@ public class SearchService {
 			}
 		}
 		return description;
+	}
+	
+	private String getKcal(Document document) {
+		try {
+			Element element = document.getElementsByTag("table").attr("class", "nutritionTable").first();
+			Element kcalEl = element.getElementsByTag("td").attr("class", "tableRow0").first();
+					
+			List<TextNode> textNodes = kcalEl.textNodes();
+			String text = textNodes.get(0).text();
+			return text;
+		} catch (Exception e) {
+			logger.error("Failed to find Calories per 100g", e);
+			return null;
+		}
 	}
 
 }

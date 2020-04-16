@@ -6,19 +6,19 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import uk.co.sainsburys.domain.Results;
+import uk.co.sainsburys.domain.ProductList;
 
 public class ResultService {
 
-	private static final String PRODUCT_CLASS = "product";
+	private static final String PRODUCT_CLASS = "productNameAndPromotions";
 	
 	public ResultService() {
 	}
 
-	public Results getResults(Document document) throws IOException {
+	public ProductList getResults(Document document) throws IOException {
 		SearchService service = new SearchService();
-		Results results = new Results();
-		Elements elements = document.getElementsByClass(PRODUCT_CLASS);
+		ProductList results = new ProductList();
+		Elements elements = document.getElementsByTag("div").attr("class", "productNameAndPromotions");
 
 		for (Element element : elements) {
 			results.addResult(service.getProduct(element));
