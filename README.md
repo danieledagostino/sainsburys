@@ -8,8 +8,8 @@ Java JDK version 7 or later will need to be installed.
 
 ## Building the application
 Open a command line and navigate to 
-<directory path>/sainsburys-assessment
-This directory should contain the downloaded source including the maven build file pom.xml.
+<directory path>/sainsburys
+This directory contains the downloaded source maven structured.
 Execute this command:
 
 `mvn clean install`
