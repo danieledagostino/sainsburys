@@ -1,0 +1,6 @@
+uk\co\sainsburys\service\SearchService.class
+uk\co\sainsburys\domain\ProductList.class
+uk\co\sainsburys\domain\Product.class
+uk\co\sainsburys\domain\Total.class
+uk\co\sainsburys\service\ResultService.class
+uk\co\sainsburys\MainProducer.class
