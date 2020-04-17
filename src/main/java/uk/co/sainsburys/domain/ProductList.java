@@ -18,4 +18,8 @@ public class ProductList {
 		return total;
 	}
 
+	public List<Product> getProducts() {
+		return products;
+	}
+	
 }

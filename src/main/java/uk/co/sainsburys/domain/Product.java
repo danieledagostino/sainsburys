@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Product {
+	
 	private String title;
 	private String kcal;
 	private BigDecimal unitPrice;

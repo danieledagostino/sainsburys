@@ -14,32 +14,32 @@ import org.jsoup.select.Elements;
 import uk.co.sainsburys.domain.Product;
 
 public class SearchService {
-	private static final Logger logger = Logger.getLogger(SearchService.class);
-	
+	private final Logger logger = Logger.getLogger(SearchService.class);
+
+	private final String COMMON_DOMAIN_URL = "https://jsainsburyplc.github.io/serverside-test/site/www.sainsburys.co.uk/";
+	private final String COMMON_STR_TO_REPLEACE = "../../../../../../";
+
 	public SearchService() {
 	}
 
-	public Product getProduct(Element element) throws IOException {
+	public Product getProduct(String url) throws IOException {
 
-		Product result = new Product();
+		Product product = new Product();
+		Document productPage = Jsoup.connect(url).get();
 
-		result.setTitle(getTitle(element));
-		result.setUnitPrice(getUnitPrice(element));
+		product.setTitle(getTitle(productPage));
+		product.setUnitPrice(getUnitPrice(productPage));
+		product.setDescription(getDescription(productPage));
+		product.setKcal(getKcal(productPage));
 
-		String url = getProductUrl(element);
-		if (url != null) {
-			Document productPage = Jsoup.connect(url).get();
-			result.setDescription(getDescription(productPage));
-			result.setKcal(getKcal(productPage));
-		}
-
-		return result;
+		return product;
 	}
 
-	private String getProductUrl(Element element) {
+	public String getProductUrl(Element element) {
 		try {
 			Element a = element.getElementsByTag("a").first();
-			return a.attr("href");
+			String url = a.attr("href");
+			return url.replace(COMMON_STR_TO_REPLEACE, COMMON_DOMAIN_URL);
 		} catch (Exception e) {
 			logger.error("Failed to find url", e);
 			return null;
@@ -47,13 +47,15 @@ public class SearchService {
 	}
 
 	private String getTitle(Element element) {
+		Element h1Tag = null;
 		try {
-			Element a = element.getElementsByClass("productInfo").first().getElementsByTag("a").first();
-			List<TextNode> textNodes = a.textNodes();
+			h1Tag = element.getElementsByClass("productTitleDescriptionContainer").first().getElementsByTag("h1")
+					.first();
+			List<TextNode> textNodes = h1Tag.textNodes();
 			return textNodes.get(0).text();
 		} catch (Exception e) {
-			logger.error("Failed to find title", e);
-			return null;
+			logger.error("Failed to find title");
+			throw e;
 		}
 	}
 
@@ -62,39 +64,40 @@ public class SearchService {
 			Element a = element.getElementsByClass("pricePerUnit").first();
 			List<TextNode> textNodes = a.textNodes();
 			String text = textNodes.get(0).text();
-			String number = text.replaceAll("[&pound, ]", "");
+			String number = text.trim().replaceAll("[&£, ]", "");
 			BigDecimal price = new BigDecimal(number);
 			return price;
 		} catch (Exception e) {
-			logger.error("Failed to find Unit Price", e);
-			return null;
+			logger.error("Failed to find Unit Price");
+			throw e;
 		}
 	}
 
-	private String getDescription(Document document) {
-		Elements elements = document.getElementsByTag("meta").attr("name", "description");
-		String description = "";
-		for (Element element : elements) {
-			Element attr = element.attr("name", "description");
-			if (attr != null) {
-				description = element.attr("content");
-				break;
-			}
-		}
-		return description;
-	}
-	
-	private String getKcal(Document document) {
+	private String getDescription(Element element) {
+		Elements elements = null;
 		try {
-			Element element = document.getElementsByTag("table").attr("class", "nutritionTable").first();
-			Element kcalEl = element.getElementsByTag("td").attr("class", "tableRow0").first();
-					
-			List<TextNode> textNodes = kcalEl.textNodes();
+			elements = element.getElementsByTag("meta").attr("name", "description");
+			String description = elements.get(1).attr("content");
+			return description;
+		} catch (Exception e) {
+			logger.error("Failed to find Unit Price");
+			throw e;
+		}
+	}
+
+	private String getKcal(Element element) {
+		Element nutritionTable = null;
+		Element kcalElement = null;
+		try {
+			nutritionTable = element.getElementsByTag("table").attr("class", "nutritionTable").first();
+			kcalElement = element.getElementsByTag("td").attr("class", "tableRow0").first();
+
+			List<TextNode> textNodes = kcalElement.textNodes();
 			String text = textNodes.get(0).text();
 			return text;
 		} catch (Exception e) {
-			logger.error("Failed to find Calories per 100g", e);
-			return null;
+			logger.error("Failed to find Calories per 100g");
+			return "";
 		}
 	}
 

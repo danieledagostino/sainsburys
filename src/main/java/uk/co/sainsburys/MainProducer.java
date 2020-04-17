@@ -12,22 +12,24 @@ import uk.co.sainsburys.domain.ProductList;
 import uk.co.sainsburys.service.ResultService;
 
 public class MainProducer {
-	
+
 	private static final String HIRING_TESTS_S3_WEBSITE = "https://jsainsburyplc.github.io/serverside-test/site/www.sainsburys.co.uk/webapp/wcs/stores/servlet/gb/groceries/berries-cherries-currants6039.html";
 	private static final Logger logger = Logger.getLogger(MainProducer.class);
-	
+
 	public static void main(String[] args) {
 
 		Document document;
 		try {
 			System.setProperty("https.protocols", "TLSv1.2");
-			
-			document = Jsoup.connect(HIRING_TESTS_S3_WEBSITE).get();
+
+			document = Jsoup.connect(HIRING_TESTS_S3_WEBSITE).userAgent(
+					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36")
+					.get();
 
 			ProductList results = new ResultService().getResults(document);
 
 			ObjectMapper om = new ObjectMapper();
-			
+
 			logger.info(om.writerWithDefaultPrettyPrinter().writeValueAsString(results));
 		} catch (IOException e) {
 			logger.error(e);
