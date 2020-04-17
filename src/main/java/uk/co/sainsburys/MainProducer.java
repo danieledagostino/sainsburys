@@ -22,9 +22,7 @@ public class MainProducer {
 		try {
 			System.setProperty("https.protocols", "TLSv1.2");
 
-			document = Jsoup.connect(HIRING_TESTS_S3_WEBSITE).userAgent(
-					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36")
-					.get();
+			document = Jsoup.connect(HIRING_TESTS_S3_WEBSITE).get();
 
 			ProductList results = new ResultService().getResults(document);
 

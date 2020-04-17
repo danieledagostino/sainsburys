@@ -4,7 +4,9 @@ import java.io.IOException;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runners.Suite.SuiteClasses;
 
 import uk.co.sainsburys.domain.ProductList;
 import uk.co.sainsburys.service.ResultService;
@@ -16,12 +18,14 @@ public class SainsburysTestSuite {
 	@Test
 	public void A_assertResults() throws IOException {
 
+		System.setProperty("https.protocols", "TLSv1.2");
+		
 		Document document = Jsoup.connect(HIRING_TESTS_S3_WEBSITE).get();
 
 		ProductList results = new ResultService().getResults(document);
 
-//		assertEquals(7, results.size());
-//		assertEquals(15.10, results.getTotal().doubleValue(), 0);
+		Assert.assertEquals(18, results.getProducts().size());
+		Assert.assertEquals(42.00, results.getTotal().getGross());
 
 	}
 }
