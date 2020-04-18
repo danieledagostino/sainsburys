@@ -17,9 +17,10 @@ import uk.co.sainsburys.service.ResultService;
 
 public class SainsburysTestSuite {
 
-	private static final String HIRING_TESTS_S3_WEBSITE = "https://jsainsburyplc.github.io/serverside-test/site/www.sainsburys.co.uk/webapp/wcs/stores/servlet/gb/groceries/berries-cherries-currants6039.html";
-
-	private Document mockingDocument;
+	private static final String REAL_WEBSITE = "https://jsainsburyplc.github.io/serverside-test/site/www.sainsburys.co.uk/webapp/wcs/stores/servlet/gb/groceries/berries-cherries-currants6039.html";
+	private static final String MOCK_WEBSITE = "http://htmlpreview.github.io/?https://github.com/danieledagostino/sainsburys/blob/master/src/test/resources/mock_webpage_with_3_product.html";
+	
+			private Document mockingDocument;
 	private final String fileName = "mock_webpage_with_3_product.html";
 	
 	@Before
@@ -34,7 +35,7 @@ public class SainsburysTestSuite {
 	@Ignore
 	public void A_assertRealCountProduct() throws IOException {
 
-		Document document = Jsoup.connect(HIRING_TESTS_S3_WEBSITE).get();
+		Document document = Jsoup.connect(REAL_WEBSITE).get();
 
 		ProductList results = new ResultService().getResults(document);
 
@@ -46,7 +47,7 @@ public class SainsburysTestSuite {
 	@Ignore
 	public void B_assertRealPriceAddition() throws IOException {
 
-		Document document = Jsoup.connect(HIRING_TESTS_S3_WEBSITE).get();
+		Document document = Jsoup.connect(REAL_WEBSITE).get();
 
 		ProductList results = new ResultService().getResults(document);
 		
